@@ -37,21 +37,30 @@ type _ACTOR struct {
 	LAST_UPDATE        timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (ACTOR _ACTOR) Constraints(dialect string, c *C) {
+func new_ACTOR(dialect string) _ACTOR {
+	tbl := _ACTOR{tableinfo: [2]string{"", "actor"}}
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(ACTOR.ACTOR_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(ACTOR.FULL_NAME_REVERSED, c.Generated("last_name || ' ' || first_name", true))
-		c.Col(ACTOR.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		tbl.tableinfo[0] = "public"
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(ACTOR.ACTOR_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(ACTOR.FIRST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(ACTOR.LAST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(ACTOR.FULL_NAME, c.Type("VARCHAR(45)"), c.Generated("CONCAT(first_name, ' ', last_name)", false))
-		c.Col(ACTOR.FULL_NAME_REVERSED, c.Type("VARCHAR(45)"), c.Generated("CONCAT(last_name, ' ', first_name)", true))
-		c.Col(ACTOR.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		tbl.tableinfo[0] = "db"
+	}
+	return tbl
+}
+
+func (ACTOR _ACTOR) Constraints(dialect string, t T) {
+	switch dialect {
+	case "postgres":
+		t.Field(ACTOR.ACTOR_ID).Identity()
+		t.Field(ACTOR.FULL_NAME_REVERSED).Generated("last_name || ' ' || first_name").Stored()
+		t.Field(ACTOR.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
+	case "mysql":
+		t.Field(ACTOR.ACTOR_ID).Autoincrement()
+		t.Field(ACTOR.FIRST_NAME).Type("VARCHAR(45)")
+		t.Field(ACTOR.LAST_NAME).Type("VARCHAR(45)")
+		t.Field(ACTOR.FULL_NAME).Type("VARCHAR(45)").Generated("CONCAT(first_name, ' ', last_name)")
+		t.Field(ACTOR.FULL_NAME_REVERSED).Type("VARCHAR(45)").Generated("CONCAT(last_name, ' ', first_name)").Stored()
+		t.Field(ACTOR.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -62,17 +71,15 @@ type _CATEGORY struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (CATEGORY _CATEGORY) Constraints(dialect string, c *C) {
+func (CATEGORY _CATEGORY) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(CATEGORY.CATEGORY_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(CATEGORY.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(CATEGORY.CATEGORY_ID).Identity()
+		t.Field(CATEGORY.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(CATEGORY.CATEGORY_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(CATEGORY.NAME, c.Type("VARCHAR(25)"))
-		c.Col(CATEGORY.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(CATEGORY.CATEGORY_ID).Autoincrement()
+		t.Field(CATEGORY.NAME).Type("VARCHAR(25)")
+		t.Field(CATEGORY.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -83,17 +90,15 @@ type _COUNTRY struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (COUNTRY _COUNTRY) Constraints(dialect string, c *C) {
+func (COUNTRY _COUNTRY) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(COUNTRY.COUNTRY_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(COUNTRY.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(COUNTRY.COUNTRY_ID).Identity()
+		t.Field(COUNTRY.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(COUNTRY.COUNTRY_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(COUNTRY.COUNTRY, c.Type("VARCHAR(50)"))
-		c.Col(COUNTRY.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(COUNTRY.COUNTRY_ID).Autoincrement()
+		t.Field(COUNTRY.COUNTRY).Type("VARCHAR(50)")
+		t.Field(COUNTRY.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -105,17 +110,15 @@ type _CITY struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (CITY _CITY) Constraints(dialect string, c *C) {
+func (CITY _CITY) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(CITY.CITY_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(CITY.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(CITY.CITY_ID).Identity()
+		t.Field(CITY.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(CITY.CITY_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(CITY.CITY, c.Type("VARCHAR(50)"))
-		c.Col(CITY.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(CITY.CITY_ID).Autoincrement()
+		t.Field(CITY.CITY).Type("VARCHAR(50)")
+		t.Field(CITY.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -131,21 +134,19 @@ type _ADDRESS struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (ADDRESS _ADDRESS) Constraints(dialect string, c *C) {
+func (ADDRESS _ADDRESS) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(ADDRESS.ADDRESS_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(ADDRESS.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(ADDRESS.ADDRESS_ID).Identity()
+		t.Field(ADDRESS.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(ADDRESS.ADDRESS_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(ADDRESS.ADDRESS, c.Type("VARCHAR(50)"))
-		c.Col(ADDRESS.ADDRESS2, c.Type("VARCHAR(50)"))
-		c.Col(ADDRESS.DISTRICT, c.Type("VARCHAR(20)"))
-		c.Col(ADDRESS.POSTAL_CODE, c.Type("VARCHAR(10)"))
-		c.Col(ADDRESS.PHONE, c.Type("VARCHAR(20)"))
-		c.Col(ADDRESS.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(ADDRESS.ADDRESS_ID).Autoincrement()
+		t.Field(ADDRESS.ADDRESS).Type("VARCHAR(50)")
+		t.Field(ADDRESS.ADDRESS2).Type("VARCHAR(50)")
+		t.Field(ADDRESS.DISTRICT).Type("VARCHAR(20)")
+		t.Field(ADDRESS.POSTAL_CODE).Type("VARCHAR(10)")
+		t.Field(ADDRESS.PHONE).Type("VARCHAR(20)")
+		t.Field(ADDRESS.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -156,17 +157,15 @@ type _LANGUAGE struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (LANGUAGE _LANGUAGE) Constraints(dialect string, c *C) {
+func (LANGUAGE _LANGUAGE) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(LANGUAGE.LANGUAGE_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(LANGUAGE.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(LANGUAGE.LANGUAGE_ID).Identity()
+		t.Field(LANGUAGE.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(LANGUAGE.LANGUAGE_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(LANGUAGE.NAME, c.Type("CHAR(20)"))
-		c.Col(LANGUAGE.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(LANGUAGE.LANGUAGE_ID).Autoincrement()
+		t.Field(LANGUAGE.NAME).Type("CHAR(20)")
+		t.Field(LANGUAGE.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -188,27 +187,25 @@ type _FILM struct {
 	FULLTEXT             stringfield `ddl:"notnull"`
 }
 
-func (FILM _FILM) Constraints(dialect string, c *C) {
+func (FILM _FILM) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.TableSchema("public")
-		c.Col(FILM.FILM_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(FILM.RELEASE_YEAR, c.Type("year"))
-		c.Col(FILM.RATING, c.Type("mpaa_rating"), c.Default("'G'::mpaa_rating"))
-		c.Col(FILM.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
-		c.Col(FILM.SPECIAL_FEATURES, c.Type("TEXT[]")) // TODO: ArrayField
-		c.Col(FILM.FULLTEXT, c.Type("TSVECTOR"))
+		t.Field(FILM.FILM_ID).Identity()
+		t.Field(FILM.RELEASE_YEAR).Type("year")
+		t.Field(FILM.RATING).Type("mpaa_rating").Default("'G'::mpaa_rating")
+		t.Field(FILM.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
+		t.Field(FILM.SPECIAL_FEATURES).Type("TEXT[]") // TODO: ArrayField
+		t.Field(FILM.FULLTEXT).Type("TSVECTOR")
 	case "mysql":
-		c.TableSchema("db")
-		c.Col(FILM.FILM_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(FILM.TITLE, c.Type("VARCHAR(255)"))
-		c.Col(FILM.DESCRIPTION, c.Type("TEXT"))
-		c.Col(FILM.RATING, c.Type("ENUM('G','PG','PG-13','R','NC-17')"))
-		c.Col(FILM.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
-		c.CheckString("film_release_year_check", "release_year >= 1901 AND release_year <= 2155")
+		t.Field(FILM.FILM_ID).Autoincrement()
+		t.Field(FILM.TITLE).Type("VARCHAR(255)")
+		t.Field(FILM.DESCRIPTION).Type("TEXT")
+		t.Field(FILM.RATING).Type("ENUM('G','PG','PG-13','R','NC-17')")
+		t.Field(FILM.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
+		t.Check("film_release_year_check", "%[1]s >= 1901 AND %[1]s <= 2155", FILM.RELEASE_YEAR)
 	case "sqlite3":
-		c.CheckString("film_release_year_check", "release_year >= 1901 AND release_year <= 2155")
-		c.CheckString("film_rating_check", "rating IN ('G','PG','PG-13','R','NC-17')")
+		t.Check("film_release_year_check", "%[1]s >= 1901 AND %[1]s <= 2155", FILM.RELEASE_YEAR)
+		t.Check("film_rating_check", "%s IN ('G','PG','PG-13','R','NC-17')", FILM.RATING)
 	}
 }
 
@@ -219,15 +216,14 @@ type _FILM_TEXT struct {
 	DESCRIPTION stringfield
 }
 
-func (FILM_TEXT _FILM_TEXT) Constraints(dialect string, c *C) {
+func (FILM_TEXT _FILM_TEXT) Constraints(dialect string, t T) {
 	switch dialect {
-	case "postgres":
-		// no-op, we will ignore this table if postgres
+	case "postgres": // no-op, we will ignore this table if postgres
 	case "mysql":
-		c.Col(FILM_TEXT.TITLE, c.Type("VARCHAR(255)"), c.NotNull(true))
-		c.Index("", "", "FULLTEXT", FILM_TEXT.TITLE, FILM_TEXT.DESCRIPTION)
+		t.Field(FILM_TEXT.TITLE).Type("VARCHAR(255)").NotNull()
+		t.Index(FILM_TEXT.TITLE, FILM_TEXT.DESCRIPTION).Using("FULLTEXT")
 	case "sqlite3":
-		c.Col(FILM_TEXT.FILM_ID, c.Type("\x00"))
+		t.Field(FILM_TEXT.FILM_ID).Ignore()
 	}
 }
 
@@ -238,12 +234,13 @@ type _FILM_ACTOR struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (FILM_ACTOR _FILM_ACTOR) Constraints(dialect string, c *C) {
+func (FILM_ACTOR _FILM_ACTOR) Constraints(dialect string, t T) {
+	t.Index(FILM_ACTOR.ACTOR_ID, FILM_ACTOR.FILM_ID).Unique()
 	switch dialect {
 	case "postgres":
-		c.Col(FILM_ACTOR.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(FILM_ACTOR.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(FILM_ACTOR.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(FILM_ACTOR.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -254,12 +251,12 @@ type _FILM_CATEGORY struct {
 	LAST_UPDATE timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (FILM_CATEGORY _FILM_CATEGORY) Constraints(dialect string, c *C) {
+func (FILM_CATEGORY _FILM_CATEGORY) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(FILM_CATEGORY.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(FILM_CATEGORY.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(FILM_CATEGORY.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(FILM_CATEGORY.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -278,20 +275,20 @@ type _STAFF struct {
 	PICTURE     blobfield
 }
 
-func (STAFF _STAFF) Constraints(dialect string, c *C) {
+func (STAFF _STAFF) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(STAFF.STAFF_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(STAFF.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
-		c.Col(STAFF.PICTURE, c.Type("BYTEA"))
+		t.Field(STAFF.STAFF_ID).Identity()
+		t.Field(STAFF.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
+		t.Field(STAFF.PICTURE).Type("BYTEA")
 	case "mysql":
-		c.Col(STAFF.STAFF_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(STAFF.FIRST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(STAFF.LAST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(STAFF.EMAIL, c.Type("VARCHAR(50)"))
-		c.Col(STAFF.USERNAME, c.Type("VARCHAR(16)"))
-		c.Col(STAFF.PASSWORD, c.Type("VARCHAR(40)"))
-		c.Col(STAFF.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(STAFF.STAFF_ID).Autoincrement()
+		t.Field(STAFF.FIRST_NAME).Type("VARCHAR(45)")
+		t.Field(STAFF.LAST_NAME).Type("VARCHAR(45)")
+		t.Field(STAFF.EMAIL).Type("VARCHAR(50)")
+		t.Field(STAFF.USERNAME).Type("VARCHAR(16)")
+		t.Field(STAFF.PASSWORD).Type("VARCHAR(40)")
+		t.Field(STAFF.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -303,14 +300,14 @@ type _STORE struct {
 	LAST_UPDATE      timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (STORE _STORE) Constraints(dialect string, c *C) {
+func (STORE _STORE) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(STORE.STORE_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(STORE.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(STORE.STORE_ID).Identity()
+		t.Field(STORE.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(STORE.STORE_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(STORE.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(STORE.STORE_ID).Autoincrement()
+		t.Field(STORE.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -328,19 +325,19 @@ type _CUSTOMER struct {
 	LAST_UPDATE timefield `ddl:"default=DATETIME('now')"`
 }
 
-func (CUSTOMER _CUSTOMER) Constraints(dialect string, c *C) {
+func (CUSTOMER _CUSTOMER) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(CUSTOMER.CUSTOMER_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(CUSTOMER.CREATE_DATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
-		c.Col(CUSTOMER.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(CUSTOMER.CUSTOMER_ID).Identity()
+		t.Field(CUSTOMER.CREATE_DATE).Type("TIMESTAMPTZ").Default("NOW()")
+		t.Field(CUSTOMER.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(CUSTOMER.CUSTOMER_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(CUSTOMER.FIRST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(CUSTOMER.LAST_NAME, c.Type("VARCHAR(45)"))
-		c.Col(CUSTOMER.EMAIL, c.Type("VARCHAR(50)"))
-		c.Col(CUSTOMER.CREATE_DATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"))
-		c.Col(CUSTOMER.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(CUSTOMER.CUSTOMER_ID).Autoincrement()
+		t.Field(CUSTOMER.FIRST_NAME).Type("VARCHAR(45)")
+		t.Field(CUSTOMER.LAST_NAME).Type("VARCHAR(45)")
+		t.Field(CUSTOMER.EMAIL).Type("VARCHAR(50)")
+		t.Field(CUSTOMER.CREATE_DATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP")
+		t.Field(CUSTOMER.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -352,14 +349,14 @@ type _INVENTORY struct {
 	LAST_UPDATE  timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (INVENTORY _INVENTORY) Constraints(dialect string, c *C) {
+func (INVENTORY _INVENTORY) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(INVENTORY.INVENTORY_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(INVENTORY.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(INVENTORY.INVENTORY_ID).Identity()
+		t.Field(INVENTORY.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(INVENTORY.INVENTORY_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(INVENTORY.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(INVENTORY.INVENTORY_ID).Autoincrement()
+		t.Field(INVENTORY.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -374,16 +371,16 @@ type _RENTAL struct {
 	LAST_UPDATE  timefield   `ddl:"default=DATETIME('now') notnull"`
 }
 
-func (RENTAL _RENTAL) Constraints(dialect string, c *C) {
+func (RENTAL _RENTAL) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(RENTAL.RENTAL_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(RENTAL.RETURN_DATE, c.Type("TIMESTAMPTZ"))
-		c.Col(RENTAL.LAST_UPDATE, c.Type("TIMESTAMPTZ"), c.Default("NOW()"))
+		t.Field(RENTAL.RENTAL_ID).Identity()
+		t.Field(RENTAL.RETURN_DATE).Type("TIMESTAMPTZ")
+		t.Field(RENTAL.LAST_UPDATE).Type("TIMESTAMPTZ").Default("NOW()")
 	case "mysql":
-		c.Col(RENTAL.RENTAL_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(RENTAL.RETURN_DATE, c.Type("TIMESTAMP"))
-		c.Col(RENTAL.LAST_UPDATE, c.Type("TIMESTAMP"), c.Default("CURRENT_TIMESTAMP"), c.OnUpdateCurrentTimestamp)
+		t.Field(RENTAL.RENTAL_ID).Autoincrement()
+		t.Field(RENTAL.RETURN_DATE).Type("TIMESTAMP")
+		t.Field(RENTAL.LAST_UPDATE).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
 	}
 }
 
@@ -397,14 +394,14 @@ type _PAYMENT struct {
 	PAYMENT_DATE timefield   `ddl:"notnull"`
 }
 
-func (PAYMENT _PAYMENT) Constraints(dialect string, c *C) {
+func (PAYMENT _PAYMENT) Constraints(dialect string, t T) {
 	switch dialect {
 	case "postgres":
-		c.Col(PAYMENT.PAYMENT_ID, c.Autoincrement(AutoincrementDefaultIdentity))
-		c.Col(PAYMENT.PAYMENT_DATE, c.Type("TIMESTAMPTZ"))
+		t.Field(PAYMENT.PAYMENT_ID).Identity()
+		t.Field(PAYMENT.PAYMENT_DATE).Type("TIMESTAMPTZ")
 	case "mysql":
-		c.Col(PAYMENT.PAYMENT_ID, c.Autoincrement(AutoincrementMySQL))
-		c.Col(PAYMENT.PAYMENT_DATE, c.Type("TIMESTAMP"))
+		t.Field(PAYMENT.PAYMENT_ID).Autoincrement()
+		t.Field(PAYMENT.PAYMENT_DATE).Type("TIMESTAMP")
 	}
 }
 
@@ -417,55 +414,31 @@ type _DUMMY_TABLE struct {
 	DATA      jsonfield
 }
 
-func (DUMMY_TABLE _DUMMY_TABLE) Constraints(dialect string, c *C) {
-	c.CheckString("dummy_table_score_positive_check", "score > 0")
-	c.CheckString("dummy_table_score_id1_greater_than_check", "score > id1")
+func (DUMMY_TABLE _DUMMY_TABLE) Constraints(dialect string, t T) {
+	t.Check("dummy_table_score_positive_check", "%s > 0", DUMMY_TABLE.SCORE)
+	t.Check("dummy_table_score_id1_greater_than_check", "%s > %s", DUMMY_TABLE.SCORE, DUMMY_TABLE.ID1)
+	t.PrimaryKey(DUMMY_TABLE.ID1, DUMMY_TABLE.ID2)
+	t.Unique(DUMMY_TABLE.SCORE, DUMMY_TABLE.COLOR)
 	switch dialect {
 	case "postgres":
-		// TODO: I need a Fieldf and Predicatef function for expressions
-
-		/*
-			c.Index("",
-				DUMMY_TABLE.SCORE,
-				ddl.Fieldf("CAST(JSON_EXTRACT(?, ?) AS INT)", DUMMY_TABLE.DATA, "$.age"),
-				DUMMY_TABLE.COLOR,
-			).Schema("").
-			Using("btree").
-			Where(ddl.Predicatef("? = ?", DUMMY_TABLE.COLOR, "red")).
-			Include(DUMMY_TABLE.ID2)
-		*/
-
-		// TODO:
-		// func (ACTOR ACTOR) Constraints(dialect string, t *ddl.T) error { } // if unrecognized dialect, allow user to return an error
-		// - type TColumn struct
-		// - func (t *T) Column(field Field) *TColumn
-		// - func (col *TColumn) Type(typ string) *TColumn
-		// - func (col *TColumn) Generated(expr string, ddl.STORED) *TColumn
-		// - func (col *TColumn) Default(expr string) *TColumn
-		// - func (col *TColumn) Autoincrement() *TColumn
-		// - func (col *TColumn) Serial() *TColumn
-		// - func (col *TColumn) Bigserial() *TColumn
-		// - func (col *TColumn) DefaultIdentity() *TColumn
-		// - func (col *TColumn) AlwaysIdentity() *TColumn
-		// - func (col *TColumn) OnUpdateCurrentTimestamp() *TColumn
-		// - func (col *TColumn) NotNull() *TColumn
-		// - func (col *TColumn) PrimaryKey() *TColumn
-		// - func (col *TColumn) Unique() *TColumn
-		// - func (col *TColumn) Collate() *TColumn
-		// t.Column(FILM.FILM_ID).Type("TIMESTAMP").Default("CURRENT_TIMESTAMP").OnUpdateCurrentTimestamp()
-		// t.Check("", ddl.Predicatef("? >= ? AND ? <= ?", FILM.RELEASE_YEAR, 1901, FILM.RELEASE_YEAR, 2155))
-		// t.Check("film_rating_check", ddl.Predicatef("? IN ('G','PG','PG-13','R','NC-17')", FILM.RATING))
-		// t.Unique(FILM_ACTOR.ACTOR_ID, FILM_ACTOR.FILM_ID)
-		// type TIndex struct
-		// t.Index("", FILM_ACTOR.ACTOR_ID, FILM_ACTOR.FILM_ID).Schema().Using().Where().Include()
-		// t.UniqueIndex("", FILM_ACTOR.ACTOR_ID, FILM_ACTOR.FILM_ID)
-
-		// TODO: OH NO: if I pass in a standalone field without the table there is literally no way for me to figure out which struct field the field came from :(
-		//       unless...? I use reflection to set the field values? No it's too much. --REQUIRE-- the user to initialize the tables before passing it into AutoMigrate
-		//       this changes everything. NewWantTables no longer utilizes reflect to obtain the field name.
-		//       this means every table I am declaring here needs a corresponding constructor.
-		c.Index("", "", "", DUMMY_TABLE.SCORE, nil, DUMMY_TABLE.COLOR)
+		t.Field(DUMMY_TABLE.COLOR).Collate("C")
+		t.NameIndex("dummy_table_score_color_data_idx").
+			Fields(DUMMY_TABLE.SCORE).
+			Expr("(%s->>'age')::INT", DUMMY_TABLE.DATA).
+			Fields(DUMMY_TABLE.COLOR).
+			Where("%s = 'red'", DUMMY_TABLE.COLOR)
 	case "mysql":
+		t.Field(DUMMY_TABLE.COLOR).Type("VARCHAR(50)").Collate("latin_swedish_ci")
+		t.NameIndex("dummy_table_score_color_data_idx").
+			Fields(DUMMY_TABLE.SCORE).
+			Expr("CAST(%s->>'$.age' AS SIGNED)", DUMMY_TABLE.DATA).
+			Fields(DUMMY_TABLE.COLOR)
 	case "sqlite3":
+		t.Field(DUMMY_TABLE.COLOR).Collate("nocase")
+		t.NameIndex("dummy_table_score_color_data_idx").
+			Fields(DUMMY_TABLE.SCORE).
+			Expr("CAST(JSON_EXTRACT(%s, '$.age') AS INT)", DUMMY_TABLE.DATA).
+			Fields(DUMMY_TABLE.COLOR).
+			Where("%s = 'red'", DUMMY_TABLE.COLOR)
 	}
 }

@@ -19,8 +19,6 @@ type Field interface {
 	// TODO: if a column professes its type to be "\x00", we must ignore it when trawling for the Columns
 }
 
-type Fields []Field
-
 type Predicate interface {
 	AppendSQLExclude(dialect string, buf *bytes.Buffer, args *[]interface{}, params map[string][]int, excludedTableQualifiers []string) error
 	Not() Predicate
@@ -70,16 +68,25 @@ type Index struct {
 	Include     []string
 }
 
-type GotTables interface {
+type Tables interface {
 	GetTables() (tableNames [][2]string, err error)
 	GetColumns(tableName [2]string) (columns map[string]Column, err error)
-	GetConstraints(tableName [2]string) (constraints map[string]TableConstraint, err error)
+	GetTableConstraints(tableName [2]string) (constraints map[string]TableConstraint, err error)
 	GetIndices(tableName [2]string) (indices map[[2]string]Index, err error)
 }
 
-type WantTables interface {
-	GotTables
-	CreateTable(tableName [2]string) (querylist []string, argslist [][]interface{}, err error)
+type tables struct {
+	dialect     string
+	tableNames  [][2]string
+	columns     map[[2]string]Column
+	constraints map[[2]string]TableConstraint
+}
+
+type TablesDefinition interface {
+	Tables
+	CreateTable(tableName [2]string) (query string, args []interface{}, err error)
 	CreateColumn(tableName [2]string, columnName string) (query string, args []interface{}, err error)
+	CreateForeignKeys(tableName [2]string) (querylist []string, argslist [][]interface{}, err error)
+	CreateConstraint(constraintName [2]string) (query []string, args []interface{}, err error)
 	CreateIndex(indexName [2]string) (query string, args []interface{}, err error)
 }
